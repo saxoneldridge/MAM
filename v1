@@ -1,0 +1,78 @@
+import os
+import datetime
+
+class MediaAsset:
+    def __init__(self, name, filetype, location):
+        self.name = name
+        self.filetype = filetype 
+        self.location = location
+        self.added_date = datetime.date.today()
+
+class MediaLibrary:
+    def __init__(self):
+        self.assets = []
+
+    def add_asset(self, asset):
+        self.assets.append(asset)
+
+    def list_assets(self):
+        for asset in self.assets:
+            print(asset.name + " (" + asset.filetype + ") in " + asset.location)
+
+    def find_by_name(self, name):
+        results = []
+        for asset in self.assets:
+            if asset.name == name:
+                results.append(asset)
+        return results
+        
+media_library = MediaLibrary()
+
+asset1 = MediaAsset("family photo", "jpg", "/users/photos/vacation")
+asset2 = MediaAsset("presentation", "ppt", "/users/work/projects")
+
+media_library.add_asset(asset1) 
+media_library.add_asset(asset2)
+
+media_library.list_assets()
+
+results = media_library.find_by_name("presentation")
+print(results[0].name)# Added keyword field to MediaAsset
+class MediaAsset:
+    def __init__(self, name, filetype, location, keywords=[]):
+        self.name = name
+        self.filetype = filetype
+        self.location = location
+        self.keywords = keywords
+        self.added_date = datetime.date.today()
+
+class MediaLibrary: 
+
+# New search method
+    def search(self, name=None, keywords=None):
+        results = []
+        for asset in self.assets:
+            if name and asset.name != name:
+                continue
+            if keywords and not any(keyword in asset.keywords for keyword in keywords):
+                continue
+            results.append(asset)
+        return results
+
+# Simulate file upload
+import shutil
+import uuid
+
+def upload_file(file_path):
+    file_name = os.path.basename(file_path)
+    file_type = os.path.splitext(file_name)[1]
+    unique_name = str(uuid.uuid4()) + file_type
+    dest_path = f"/uploads/{unique_name}"
+    shutil.copy(file_path, dest_path)
+    return dest_path 
+
+photo = upload_file("/users/photos/photo.jpg") 
+asset = MediaAsset("My Photo", "jpg", photo, ["vacation", "family"])
+media_library.add_asset(asset)
+
+results = media_library.search(keywords=["family"])
